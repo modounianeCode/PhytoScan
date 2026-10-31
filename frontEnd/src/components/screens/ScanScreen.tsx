@@ -150,7 +150,7 @@ export const ScanScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white text-gray-800 rounded-[32px] overflow-hidden shadow-2xl border border-gray-200/80 max-w-[380px] w-full mx-auto select-none relative">
+    <div className="flex flex-col h-full w-full bg-white text-gray-800 select-none relative overflow-hidden">
       {/* Hidden elements pour capture caméra et upload */}
       <canvas ref={canvasRef} className="hidden" />
       <input 
