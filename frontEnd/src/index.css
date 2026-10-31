@@ -33,6 +33,25 @@
   }
 }
 
+@keyframes scan-laser {
+  0% {
+    top: 6%;
+    opacity: 0.7;
+  }
+  50% {
+    top: 90%;
+    opacity: 1;
+  }
+  100% {
+    top: 6%;
+    opacity: 0.7;
+  }
+}
+
+.animate-scan-laser {
+  animation: scan-laser 2.2s infinite ease-in-out;
+}
+
 .animate-pulse-ring {
   animation: pulse-ring 2s infinite ease-in-out;
 }
