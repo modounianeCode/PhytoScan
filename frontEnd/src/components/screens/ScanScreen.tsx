@@ -17,9 +17,10 @@ import {
   Maximize2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { analyzeLeafImage } from '../../services/api';
 
 export const ScanScreen: React.FC = () => {
-  const { currentDetection, navigateTo, addPlantFromScan } = useApp();
+  const { currentDetection, setDetection, navigateTo, addPlantFromScan } = useApp();
   
   // États de l'analyse et de la caméra
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -113,10 +114,13 @@ export const ScanScreen: React.FC = () => {
   };
 
   // Lancer l'analyse du scan avec animation réaliste
-  const startScanAnalysis = () => {
+  const startScanAnalysis = async () => {
+    let currentImageToScan = imagePreview;
+
     if (activeSource === 'camera' && cameraActive) {
       const snapshot = captureCameraFrame();
       if (snapshot) {
+        currentImageToScan = snapshot;
         setImagePreview(snapshot);
       }
     }
@@ -133,14 +137,22 @@ export const ScanScreen: React.FC = () => {
     ];
 
     let currentProgress = 5;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       currentProgress += 15;
       if (currentProgress >= 100) {
         currentProgress = 100;
         clearInterval(interval);
         setProgress(100);
         setAnalysisStepText('Diagnostic terminé');
-        setIsAnalyzing(false);
+
+        try {
+          const result = await analyzeLeafImage(currentImageToScan);
+          setDetection(result);
+        } catch (err) {
+          console.error("Erreur d'analyse:", err);
+        } finally {
+          setIsAnalyzing(false);
+        }
       } else {
         setProgress(currentProgress);
         const match = steps.find((s) => currentProgress <= s.at);

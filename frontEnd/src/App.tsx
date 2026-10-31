@@ -3,25 +3,29 @@ import { AppProvider, useApp, ScreenType } from './context/AppContext';
 import { ScanScreen } from './components/screens/ScanScreen';
 import { PlantFolderScreen } from './components/screens/PlantFolderScreen';
 import { VoiceAssistantScreen } from './components/screens/VoiceAssistantScreen';
+import { SidebarDrawer } from './components/common/SidebarDrawer';
 import { Scan, FolderHeart, Bot } from 'lucide-react';
 
 const MobileApp: React.FC = () => {
   const { currentScreen, navigateTo } = useApp();
 
   return (
-    <div className="min-h-screen bg-slate-900 md:bg-slate-100 flex items-center justify-center font-sans antialiased md:p-4">
-      {/* Container Application Mobile (Plein écran sur smartphone, châssis centré sur desktop) */}
-      <div className="w-full max-w-[420px] h-screen md:h-[844px] bg-white md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col justify-between md:border-8 md:border-slate-800 relative">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between font-sans antialiased relative">
+      {/* Volet Latéral Menu Hamburger */}
+      <SidebarDrawer />
+
+      {/* Contenu Principal plein écran dans le navigateur (avec largeur optimale fluide) */}
+      <div className="flex-1 w-full max-w-lg mx-auto bg-white shadow-xs border-x border-gray-100 flex flex-col relative min-h-screen">
         
         {/* Écran actif unique */}
-        <main className="flex-1 overflow-hidden flex flex-col">
+        <main className="flex-1 flex flex-col pb-16 overflow-y-auto">
           {currentScreen === 'scan' && <ScanScreen />}
           {currentScreen === 'folder' && <PlantFolderScreen />}
           {currentScreen === 'assistant' && <VoiceAssistantScreen />}
         </main>
 
-        {/* Barre de navigation inférieure fixe (Mobile Bottom Bar) */}
-        <nav className="flex justify-around items-center pt-2.5 pb-3 border-t border-gray-100 bg-white/95 backdrop-blur-md flex-shrink-0 z-40 select-none px-4">
+        {/* Barre de navigation inférieure fixe */}
+        <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto flex justify-around items-center pt-2.5 pb-3 border-t border-gray-200 bg-white/95 backdrop-blur-md z-40 select-none px-4 shadow-lg">
           <button
             onClick={() => navigateTo('scan' as ScreenType)}
             className={`flex flex-col items-center text-[11px] font-bold transition-all ${
@@ -30,7 +34,7 @@ const MobileApp: React.FC = () => {
                 : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            <div className={`p-1 rounded-xl transition ${currentScreen === 'scan' ? 'bg-emerald-50' : ''}`}>
+            <div className={`p-1 rounded-xl transition ${currentScreen === 'scan' ? 'bg-emerald-50 text-emerald-800' : ''}`}>
               <Scan className="w-5 h-5 mb-0.5" />
             </div>
             <span>Scanner</span>
@@ -44,7 +48,7 @@ const MobileApp: React.FC = () => {
                 : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            <div className={`p-1 rounded-xl transition ${currentScreen === 'folder' ? 'bg-emerald-50' : ''}`}>
+            <div className={`p-1 rounded-xl transition ${currentScreen === 'folder' ? 'bg-emerald-50 text-emerald-800' : ''}`}>
               <FolderHeart className="w-5 h-5 mb-0.5" />
             </div>
             <span>Mes plantes</span>
@@ -58,7 +62,7 @@ const MobileApp: React.FC = () => {
                 : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            <div className={`p-1 rounded-xl transition ${currentScreen === 'assistant' ? 'bg-emerald-50' : ''}`}>
+            <div className={`p-1 rounded-xl transition ${currentScreen === 'assistant' ? 'bg-emerald-50 text-emerald-800' : ''}`}>
               <Bot className="w-5 h-5 mb-0.5" />
             </div>
             <span>Assistant</span>

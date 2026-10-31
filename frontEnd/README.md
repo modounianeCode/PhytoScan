@@ -56,6 +56,15 @@ L'application est totalement connectée via `AppContext` :
 
 ---
 
+## 🔌 Couche d'Intégration API (`src/services/api.ts`)
+
+Pour faciliter la collaboration avec votre équipe backend :
+- **Fichier `src/services/api.ts` :** centralise tous les appels REST (`analyzeLeafImage`, `fetchPlants`, `savePlantRecord`, `queryAssistant`).
+- **Interrupteur `USE_MOCK` :** permet de travailler en mode simulation locale tant que le backend n'est pas lancé. Dès que le backend est prêt, mettez `USE_MOCK = false` (ou `VITE_USE_MOCK=false` dans votre `.env`).
+- **Fichier `.env.example` :** modèle de configuration pour spécifier l'URL du backend (`VITE_API_URL=http://localhost:8000/api`).
+
+---
+
 ## 📱 Détail des Écrans
 
 - **[ScanScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/ScanScreen.tsx) :** Viseur caméra, animation d'analyse en direct, badge maladie, comparaison visuelle, ajout au carnet.

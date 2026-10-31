@@ -52,6 +52,19 @@
   animation: scan-laser 2.2s infinite ease-in-out;
 }
 
+@keyframes slide-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-slideLeft {
+  animation: slide-left 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .animate-pulse-ring {
   animation: pulse-ring 2s infinite ease-in-out;
 }

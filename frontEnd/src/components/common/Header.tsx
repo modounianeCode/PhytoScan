@@ -9,7 +9,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ showBack, onBack, onMenuClick }) => {
-  const { canGoBack, goBack } = useApp();
+  const { canGoBack, goBack, openMenu } = useApp();
 
   const handleBack = () => {
     if (onBack) {
@@ -59,9 +59,10 @@ export const Header: React.FC<HeaderProps> = ({ showBack, onBack, onMenuClick })
         </div>
 
         <button 
-          onClick={onMenuClick}
+          onClick={onMenuClick || openMenu}
           className="p-1.5 text-gray-700 hover:text-emerald-800 rounded-lg hover:bg-gray-100 transition"
           aria-label="Menu"
+          title="Ouvrir le menu"
         >
           <Menu className="w-5 h-5" />
         </button>

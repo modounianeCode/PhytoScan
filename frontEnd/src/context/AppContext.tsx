@@ -11,6 +11,11 @@ interface AppContextType {
   goBack: () => void;
   canGoBack: boolean;
 
+  // Menu latéral
+  isMenuOpen: boolean;
+  openMenu: () => void;
+  closeMenu: () => void;
+
   // Données des plantes
   plants: Plant[];
   selectedPlantId: string;
@@ -35,6 +40,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('scan');
   const [history, setHistory] = useState<ScreenType[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [plants, setPlants] = useState<Plant[]>(mockPlants);
   const [selectedPlantId, setSelectedPlantId] = useState<string>('p1');
   const [activeLanguage, setActiveLanguage] = useState<SupportedLanguage>('fr');
@@ -47,6 +53,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
     setHistory((prev) => [...prev, currentScreen]);
     setCurrentScreen(screen);
+    setIsMenuOpen(false);
   };
 
   const goBack = () => {
@@ -56,6 +63,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setCurrentScreen(prev);
     }
   };
+
+  const openMenu = () => setIsMenuOpen(true);
+  const closeMenu = () => setIsMenuOpen(false);
 
   const selectPlant = (id: string) => {
     setSelectedPlantId(id);
@@ -102,6 +112,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         navigateTo,
         goBack,
         canGoBack: history.length > 0,
+        isMenuOpen,
+        openMenu,
+        closeMenu,
         plants,
         selectedPlantId,
         selectedPlant,

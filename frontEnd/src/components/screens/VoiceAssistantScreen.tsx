@@ -5,6 +5,8 @@ import { mockChatMessages } from '../../data/mockData';
 import { useApp } from '../../context/AppContext';
 import { SupportedLanguage, ChatMessage } from '../../types';
 
+import { queryAssistant } from '../../services/api';
+
 export const VoiceAssistantScreen: React.FC = () => {
   const { activeLanguage, setLanguage, activeAlert, navigateTo, selectedPlant } = useApp();
   const [isRecording, setIsRecording] = useState(false);
@@ -38,7 +40,7 @@ export const VoiceAssistantScreen: React.FC = () => {
     }, 2800);
   };
 
-  const sendMessage = (textToSend?: string) => {
+  const sendMessage = async (textToSend?: string) => {
     const text = textToSend || inputText;
     if (!text.trim()) return;
 
@@ -49,29 +51,30 @@ export const VoiceAssistantScreen: React.FC = () => {
       timestamp: 'À l’instant'
     };
 
-    let replyText = '';
-    if (activeLanguage === 'wo') {
-      replyText = 'Dafa am solo nga dindi xob yi féebar te bul sotti ndox ci xob yi. Nga def ci garabu néem mbaa purin.';
-    } else if (activeLanguage === 'en') {
-      replyText = 'Immediately prune the infected leaves and avoid watering overhead. Apply an approved organic copper fungicide.';
-    } else {
-      replyText = 'Coupez immédiatement les feuilles les plus atteintes et arrosez uniquement au pied. Appliquez un fongicide au cuivre ou du purin de prêle.';
-    }
-
-    const botMsg: ChatMessage = {
-      id: `b-${Date.now()}`,
-      sender: 'assistant',
-      text: replyText,
-      timestamp: 'À l’instant'
-    };
-
+    setInputText('');
     setConversation((prev) => ({
       ...prev,
-      [activeLanguage]: [...prev[activeLanguage], userMsg, botMsg]
+      [activeLanguage]: [...prev[activeLanguage], userMsg]
     }));
 
-    setInputText('');
-    handleSpeakBotMessage(replyText);
+    try {
+      const response = await queryAssistant(text.trim(), activeLanguage);
+      const botMsg: ChatMessage = {
+        id: `b-${Date.now()}`,
+        sender: 'assistant',
+        text: response.answer,
+        timestamp: 'À l’instant'
+      };
+
+      setConversation((prev) => ({
+        ...prev,
+        [activeLanguage]: [...prev[activeLanguage], botMsg]
+      }));
+
+      handleSpeakBotMessage(response.answer);
+    } catch (err) {
+      console.error("Erreur assistant:", err);
+    }
   };
 
   const handleSpeakBotMessage = (text: string) => {
