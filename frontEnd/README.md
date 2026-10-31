@@ -59,7 +59,13 @@ L'application est totalement connectée via `AppContext` :
 ## 📱 Détail des Écrans
 
 - **[ScanScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/ScanScreen.tsx) :** Viseur caméra, animation d'analyse en direct, badge maladie, comparaison visuelle, ajout au carnet.
-- **[PlantFolderScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/PlantFolderScreen.tsx) :** Barre de recherche, carrousel d'état (vert/jaune/rouge), onglets (Détails, Historique, Soins, Observations), raccourci scan.
+- **[PlantFolderScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/PlantFolderScreen.tsx) :** 
+  - Moteur de recherche et filtre avancé par santé (Toutes, 🟢 Saines, 🟡 À surveiller, 🔴 Malades).
+  - Carrousel horizontal interactif avec sélection dynamique et carte d'ajout rapide.
+  - Système à 4 onglets opérationnels : *Détails*, *Historique*, *Soins*, *Observations*.
+  - Modale d'historique complet chronologique.
+  - Ajout direct de notes d'observations de terrain pour l'agriculteur.
+  - Passerelle directe vers l'Écran 1 (Scanner) et l'Écran 3 (Assistant avec sujet ciblé).
 - **[VoiceAssistantScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/VoiceAssistantScreen.tsx) :** Discussion trilingue (**Français, Wolof, Anglais**), animation sonore, micro interactif, synthèse vocale, alerte prioritaire.
 
 ---
