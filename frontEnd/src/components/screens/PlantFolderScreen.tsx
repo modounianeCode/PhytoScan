@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { Header } from '../common/Header';
-import { Search, SlidersHorizontal, ChevronRight, Sprout, Flower2, Calendar, Clock, HeartHandshake, Eye } from 'lucide-react';
-import { mockPlants } from '../../data/mockData';
-import { Plant, HealthStatus } from '../../types';
+import { Search, SlidersHorizontal, ChevronRight, Sprout, Flower2, Calendar, Clock, HeartHandshake, Eye, Camera, MessageSquare } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { HealthStatus } from '../../types';
 
 export const PlantFolderScreen: React.FC = () => {
-  const [plants] = useState<Plant[]>(mockPlants);
-  const [selectedPlantId, setSelectedPlantId] = useState<string>('p1');
+  const { plants, selectedPlant, selectedPlantId, selectPlant, navigateTo } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'details' | 'history' | 'care' | 'observations'>('details');
-
-  const selectedPlant = plants.find((p) => p.id === selectedPlantId) || plants[0];
 
   const filteredPlants = plants.filter((p) => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -50,8 +47,18 @@ export const PlantFolderScreen: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3.5 scrollbar-thin">
-        {/* Title */}
-        <h3 className="text-base font-bold text-gray-900 tracking-tight">Mes plantes</h3>
+        {/* Title + Quick Scan shortcut */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold text-gray-900 tracking-tight">Mes plantes</h3>
+          <button
+            onClick={() => navigateTo('scan')}
+            className="flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 transition"
+            title="Scanner une nouvelle plante"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span>Scanner</span>
+          </button>
+        </div>
 
         {/* Search Bar + Filter */}
         <div className="flex items-center gap-2">
@@ -73,21 +80,21 @@ export const PlantFolderScreen: React.FC = () => {
         {/* Horizontal Plant Carousel / Grid */}
         <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
           {filteredPlants.map((plant) => {
-            const isSelected = plant.id === selectedPlant.id;
+            const isSelected = plant.id === selectedPlantId;
             return (
               <div
                 key={plant.id}
-                onClick={() => setSelectedPlantId(plant.id)}
+                onClick={() => selectPlant(plant.id)}
                 className={`min-w-[95px] flex-1 bg-white border rounded-xl p-2 flex flex-col items-center cursor-pointer transition-all ${
                   isSelected 
-                    ? 'border-emerald-600 shadow-sm ring-1 ring-emerald-600 bg-emerald-50/20' 
+                    ? 'border-emerald-600 shadow-sm ring-1 ring-emerald-600 bg-emerald-50/20 scale-[1.02]' 
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="w-14 h-14 rounded-lg overflow-hidden mb-1.5 bg-gray-100">
                   <img src={plant.image} alt={plant.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-xs font-bold text-gray-800 mb-1">{plant.name}</span>
+                <span className="text-xs font-bold text-gray-800 mb-1 line-clamp-1">{plant.name}</span>
                 {getStatusBadge(plant.status, plant.statusLabel)}
               </div>
             );
@@ -97,17 +104,28 @@ export const PlantFolderScreen: React.FC = () => {
         {/* Selected Plant Detailed Card */}
         <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 shadow-sm space-y-3">
           {/* Header of Detail */}
-          <div className="flex items-center gap-3">
-            <div className="w-16 h-16 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
-              <img src={selectedPlant.image} alt={selectedPlant.name} className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <h4 className="text-base font-bold text-gray-900">{selectedPlant.name}</h4>
-              <div className="mt-1 flex items-center gap-2">
-                {getStatusBadge(selectedPlant.status, selectedPlant.statusLabel)}
-                <span className="text-xs text-gray-400 font-medium">ID : {selectedPlant.code}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl overflow-hidden shadow-sm flex-shrink-0">
+                <img src={selectedPlant.image} alt={selectedPlant.name} className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-gray-900">{selectedPlant.name}</h4>
+                <div className="mt-1 flex items-center gap-2">
+                  {getStatusBadge(selectedPlant.status, selectedPlant.statusLabel)}
+                  <span className="text-xs text-gray-400 font-medium">ID : {selectedPlant.code}</span>
+                </div>
               </div>
             </div>
+
+            {/* Quick action: ask AI about this plant */}
+            <button
+              onClick={() => navigateTo('assistant')}
+              className="p-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 transition"
+              title="Demander conseil à l'assistant pour cette plante"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Tab Navigation */}
@@ -192,7 +210,7 @@ export const PlantFolderScreen: React.FC = () => {
           )}
 
           {activeTab === 'history' && (
-            <div className="space-y-2 text-xs pt-1">
+            <div className="space-y-2 text-xs pt-1 max-h-40 overflow-y-auto">
               {selectedPlant.history?.map((h, i) => (
                 <div key={i} className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex justify-between items-center">
                   <div>
@@ -206,7 +224,7 @@ export const PlantFolderScreen: React.FC = () => {
           )}
 
           {activeTab === 'care' && (
-            <div className="space-y-1.5 text-xs pt-1">
+            <div className="space-y-1.5 text-xs pt-1 max-h-40 overflow-y-auto">
               {selectedPlant.care?.map((c, i) => (
                 <div key={i} className="flex items-start gap-2 text-gray-700">
                   <HeartHandshake className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -217,7 +235,7 @@ export const PlantFolderScreen: React.FC = () => {
           )}
 
           {activeTab === 'observations' && (
-            <div className="space-y-1.5 text-xs pt-1">
+            <div className="space-y-1.5 text-xs pt-1 max-h-40 overflow-y-auto">
               {selectedPlant.observations?.map((obs, i) => (
                 <div key={i} className="flex items-start gap-2 text-gray-700">
                   <Eye className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -228,9 +246,12 @@ export const PlantFolderScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Action Button */}
+        {/* Action Button: Voir l'historique complet */}
         <div className="pt-1 pb-1">
-          <button className="w-full bg-[#0e4a3b] hover:bg-[#0b382d] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition text-sm">
+          <button 
+            onClick={() => setActiveTab('history')}
+            className="w-full bg-[#0e4a3b] hover:bg-[#0b382d] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition text-sm"
+          >
             <span>Voir l'historique complet</span>
             <ChevronRight className="w-4 h-4" />
           </button>

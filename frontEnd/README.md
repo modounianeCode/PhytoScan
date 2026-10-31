@@ -1,69 +1,73 @@
-# PhytoScan AI - Interface Frontend
+# 🌿 PhytoScan AI - Documentation Frontend & Guide de Navigation
 
-Application frontend Mobile-First développée en **React + TypeScript + Vite + Tailwind CSS** reproduisant fidèlement la maquette du dossier `images/scan.jpeg`.
-
-## 🌿 Fonctionnalités implémentées
-
-L'application propose deux modes d'affichage commutables depuis la barre supérieure :
-1. **Vue Présentation (Poster 3 Écrans)** : Affiche les 3 écrans côte-à-côte avec les bannières explicatives et flèches de transition (idéal pour les démonstrations de projet et présentations).
-2. **Simulateur Mobile** : Simule un smartphone interactif avec une barre de navigation inférieure (Scanner, Mes plantes, Assistant).
-
-### 📱 Les 3 Écrans
-
-- **1. Détection des maladies par l'IA (Scan)** :
-  - Viseur caméra avec mires de cadrage `[ ]`.
-  - Bouton interactif d'analyse avec simulation en temps réel (`Analyse en cours...` et barre de progression).
-  - Carte de résultat IA (*Tache foliaire Cercospora*, statut *Maladie détectée*).
-  - Comparatif visuel *Plante saine* vs *Plante malade*.
-  - Bouton d'action `📷 Nouvelle analyse`.
-
-- **2. Dossier numérique des plantes** :
-  - Barre de recherche de plante avec filtre.
-  - Carrousel horizontal interactif des plantes avec badges d'état (🟢 Saine, 🟡 À surveiller, 🔴 Malade).
-  - Fiche détaillée dynamique par plante sélectionnée.
-  - Système d'onglets fonctionnels : `Détails`, `Historique`, `Soins`, `Observations`.
-  - Bouton `Voir l'historique complet`.
-
-- **3. Assistant vocal et alertes** :
-  - Historique de discussion interactive (messages utilisateur et réponses IA).
-  - **Sélecteur de langue trilingue** : Français (🇮🇹/🇫🇷), **Wolof (🇸🇳)** et Anglais (🇬🇧). Le texte et les alertes s'adaptent automatiquement selon la langue choisie !
-  - Synthèse vocale intégrée pour écouter les réponses de l'IA.
-  - Bouton microphone avec onde sonore animée.
-  - Carte d'alerte urgente et prescription d'intervention.
+## 📖 Sommaire
+1. [Présentation du projet](#-présentation-du-projet)
+2. [Flux de Navigation Inter-Écrans](#-flux-de-navigation-inter-écrans)
+3. [Détail des Écrans](#-détail-des-écrans)
+4. [Gestion de l'État Global (AppContext)](#-gestion-de-létat-global-appcontext)
+5. [Lancement et Commandes](#-lancement-et-commandes)
 
 ---
 
-## 🚀 Lancement en local
+## 🌾 Présentation du Projet
+
+PhytoScan AI est une solution d'agriculture de précision pensée pour les producteurs agricoles. Elle permet :
+- Le diagnostic instantané des maladies foliaires par intelligence artificielle.
+- La gestion et le suivi de santé des plantes via un carnet numérique.
+- Le conseil agronomique vocal accessible en **Français**, **Wolof** et **Anglais**.
+
+---
+
+## 🔄 Flux de Navigation Inter-Écrans
+
+L'application est totalement connectée via `AppContext` :
+
+```
+┌──────────────────────────┐             ┌──────────────────────────┐
+│   ÉCRAN 1 : SCAN IA      │             │ ÉCRAN 2 : DOSSIER PLANTES│
+│                          │             │                          │
+│ • Carte Résultat         ├────────────►│ • Affiche la fiche de    │
+│ • Bouton "Ajouter dossier"│             │   la plante scannée      │
+│                          │             │                          │
+│ • Bouton "Demander       │             │ • Bouton "Poser une      │
+│   conseil à l'IA"        ├──┐       ┌──┤   question sur la plante"│
+└──────────────────────────┘  │       │  └──────────────────────────┘
+                              │       │                ▲
+                              ▼       ▼                │
+                     ┌──────────────────────────┐      │
+                     │ ÉCRAN 3 : ASSISTANT VOCAL│      │
+                     │                          │      │
+                     │ • Carte d'alerte rouge   ├──────┘
+                     │   (Clic ➔ Ouvre la fiche │
+                     │    de la Plante 2)       │
+                     └──────────────────────────┘
+```
+
+1. **Scan ➔ Dossier :** 
+   - Un clic sur la carte de diagnostic (*Tache foliaire*) ou sur le bouton *"Ajouter au dossier"* bascule vers le dossier et met en valeur la plante concernée.
+2. **Scan ➔ Assistant :**
+   - Le bouton *"Demander conseil"* bascule vers l'assistant vocal pour obtenir la conduite à tenir.
+3. **Dossier ➔ Assistant :**
+   - Sur n'importe quelle fiche de plante, l'icône de message permet d'ouvrir l'assistant en gardant le sujet de la plante en mémoire.
+4. **Assistant ➔ Dossier :**
+   - Cliquer sur la carte d'alerte rouge en bas de l'assistant ouvre immédiatement la fiche de la plante malade (*Plante 2*).
+5. **Bouton Retour `<` universel :**
+   - Géré par une pile d'historique de navigation pour revenir en arrière à tout moment.
+
+---
+
+## 📱 Détail des Écrans
+
+- **[ScanScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/ScanScreen.tsx) :** Viseur caméra, animation d'analyse en direct, badge maladie, comparaison visuelle, ajout au carnet.
+- **[PlantFolderScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/PlantFolderScreen.tsx) :** Barre de recherche, carrousel d'état (vert/jaune/rouge), onglets (Détails, Historique, Soins, Observations), raccourci scan.
+- **[VoiceAssistantScreen.tsx](file:///home/modou-niane/PhytoScan/frontEnd/src/components/screens/VoiceAssistantScreen.tsx) :** Discussion trilingue (**Français, Wolof, Anglais**), animation sonore, micro interactif, synthèse vocale, alerte prioritaire.
+
+---
+
+## 🛠️ Lancement
 
 ```bash
-cd frontEnd
 npm install
 npm run dev
 ```
-
-Puis ouvrez votre navigateur à l'adresse indiquée (ex: `http://localhost:5174/`).
-
-## 📁 Architecture des fichiers
-
-```text
-frontEnd/
-├── images/
-│   └── scan.jpeg              # Maquette de référence
-├── src/
-│   ├── components/
-│   │   ├── common/
-│   │   │   └── Header.tsx     # Barre de statut smartphone et logo
-│   │   └── screens/
-│   │       ├── ScanScreen.tsx           # Écran 1 : Détection IA
-│   │       ├── PlantFolderScreen.tsx    # Écran 2 : Dossier plantes
-│   │       └── VoiceAssistantScreen.tsx # Écran 3 : Assistant vocal & langues
-│   ├── data/
-│   │   └── mockData.ts        # Données de test (plantes, diagnostics, traductions Wolof/FR/EN)
-│   ├── types/
-│   │   └── index.ts           # Types TypeScript
-│   ├── App.tsx                # Conteneur principal (Poster 3 écrans + simulateur mobile)
-│   ├── main.tsx
-│   └── index.css              # Styles Tailwind & animations personnalisées
-├── tailwind.config.js
-└── vite.config.ts
-```
+Rendez-vous sur `http://localhost:5174/` !

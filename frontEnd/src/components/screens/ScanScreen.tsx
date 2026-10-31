@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { Header } from '../common/Header';
-import { Camera, CheckCircle2, ChevronRight, Loader2, Sparkles } from 'lucide-react';
-import { mockDetection } from '../../data/mockData';
+import { Camera, CheckCircle2, ChevronRight, Loader2, Sparkles, FolderPlus, MessageSquareText } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 
-interface ScanScreenProps {
-  onNextScreen?: () => void;
-}
-
-export const ScanScreen: React.FC<ScanScreenProps> = () => {
+export const ScanScreen: React.FC = () => {
+  const { currentDetection, navigateTo, addPlantFromScan } = useApp();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(85);
 
   const handleNewScan = () => {
     setIsAnalyzing(true);
-    setProgress(15);
+    setProgress(10);
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -21,20 +18,20 @@ export const ScanScreen: React.FC<ScanScreenProps> = () => {
           setIsAnalyzing(false);
           return 100;
         }
-        return prev + 25;
+        return prev + 30;
       });
-    }, 400);
+    }, 350);
   };
 
   return (
     <div className="flex flex-col h-full bg-white text-gray-800 rounded-[32px] overflow-hidden shadow-2xl border border-gray-200/80 max-w-[380px] w-full mx-auto select-none">
-      {/* Header */}
+      {/* Header avec retour opérationnel */}
       <Header showBack={true} />
 
       {/* Main Content Scrollable */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3.5 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin">
         {/* Camera Viewfinder Area */}
-        <div className="relative w-full h-52 bg-slate-900 rounded-2xl overflow-hidden shadow-inner group">
+        <div className="relative w-full h-48 bg-slate-900 rounded-2xl overflow-hidden shadow-inner group">
           <img 
             src="https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&w=600&q=80" 
             alt="Feuille scannée" 
@@ -85,20 +82,24 @@ export const ScanScreen: React.FC<ScanScreenProps> = () => {
           </div>
         </div>
 
-        {/* AI Result Card */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-3 shadow-sm hover:shadow-md transition">
+        {/* AI Result Card - Interactif (Clic pour voir le dossier) */}
+        <div 
+          onClick={() => navigateTo('folder', { plantId: 'p3' })}
+          className="bg-white border border-gray-200/80 rounded-2xl p-3 shadow-sm hover:border-emerald-300 hover:shadow-md transition cursor-pointer group"
+          title="Cliquer pour voir la fiche dans le dossier"
+        >
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5 text-emerald-900 font-bold text-sm">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 fill-emerald-100" />
-              <span>{mockDetection.title}</span>
+              <span>{currentDetection.title}</span>
             </div>
-            <div className="flex items-center gap-1 bg-red-50 text-red-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-100">
-              <span>{mockDetection.status === 'infected' ? 'Maladie détectée' : 'Plante saine'}</span>
-              <ChevronRight className="w-3 h-3 text-red-500" />
+            <div className="flex items-center gap-1 bg-red-50 text-red-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-100 group-hover:bg-red-100 transition">
+              <span>{currentDetection.status === 'infected' ? 'Maladie détectée' : 'Plante saine'}</span>
+              <ChevronRight className="w-3 h-3 text-red-500 group-hover:translate-x-0.5 transition" />
             </div>
           </div>
-          <p className="text-sm font-semibold text-gray-700 pl-6">
-            {mockDetection.diseaseName}
+          <p className="text-sm font-semibold text-gray-800 pl-6">
+            {currentDetection.diseaseName}
           </p>
         </div>
 
@@ -108,43 +109,64 @@ export const ScanScreen: React.FC<ScanScreenProps> = () => {
           <div className="grid grid-cols-2 gap-2.5">
             {/* Healthy Plant */}
             <div className="bg-gray-50 border border-gray-100 rounded-xl p-1.5 flex flex-col items-center">
-              <div className="w-full h-20 rounded-lg overflow-hidden mb-1.5">
+              <div className="w-full h-16 rounded-lg overflow-hidden mb-1.5">
                 <img 
-                  src={mockDetection.healthySampleImg} 
+                  src={currentDetection.healthySampleImg} 
                   alt="Plante saine" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="w-full text-center text-[11px] font-semibold text-emerald-800 bg-emerald-100/80 py-1 rounded-md">
+              <span className="w-full text-center text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 py-0.5 rounded-md">
                 Plante saine
               </span>
             </div>
 
             {/* Sick Plant */}
             <div className="bg-gray-50 border border-gray-100 rounded-xl p-1.5 flex flex-col items-center">
-              <div className="w-full h-20 rounded-lg overflow-hidden mb-1.5">
+              <div className="w-full h-16 rounded-lg overflow-hidden mb-1.5">
                 <img 
-                  src={mockDetection.infectedSampleImg} 
+                  src={currentDetection.infectedSampleImg} 
                   alt="Plante malade" 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="w-full text-center text-[11px] font-semibold text-red-700 bg-red-100/80 py-1 rounded-md">
+              <span className="w-full text-center text-[10px] font-semibold text-red-700 bg-red-100/80 py-0.5 rounded-md">
                 Plante malade
               </span>
             </div>
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="pt-1 pb-1">
+        {/* Passerelles interactives vers Dossier & Assistant */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <button
+            onClick={() => addPlantFromScan('Nouvelle plante diagnostiquée')}
+            className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition active:scale-95"
+            title="Enregistrer cette plante dans votre carnet"
+          >
+            <FolderPlus className="w-3.5 h-3.5 text-emerald-700" />
+            <span>Ajouter au dossier</span>
+          </button>
+
+          <button
+            onClick={() => navigateTo('assistant')}
+            className="flex items-center justify-center gap-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition active:scale-95"
+            title="Demander conseil à l'assistant vocal"
+          >
+            <MessageSquareText className="w-3.5 h-3.5 text-emerald-700" />
+            <span>Demander conseil</span>
+          </button>
+        </div>
+
+        {/* Bouton Action Principal : Nouvelle analyse */}
+        <div className="pt-0.5 pb-1">
           <button 
             onClick={handleNewScan}
             disabled={isAnalyzing}
-            className="w-full bg-[#0e4a3b] hover:bg-[#0b382d] active:scale-[0.98] text-white font-semibold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition text-sm"
+            className="w-full bg-[#0e4a3b] hover:bg-[#0b382d] active:scale-[0.98] text-white font-semibold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition text-xs"
           >
             <Camera className="w-4 h-4" />
-            <span>{isAnalyzing ? "Analyse..." : "Nouvelle analyse"}</span>
+            <span>{isAnalyzing ? "Analyse en cours..." : "Nouvelle analyse"}</span>
           </button>
         </div>
       </div>

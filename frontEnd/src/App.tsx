@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AppProvider, useApp, ScreenType } from './context/AppContext';
 import { ScanScreen } from './components/screens/ScanScreen';
 import { PlantFolderScreen } from './components/screens/PlantFolderScreen';
 import { VoiceAssistantScreen } from './components/screens/VoiceAssistantScreen';
@@ -14,9 +15,9 @@ import {
   Smartphone 
 } from 'lucide-react';
 
-export const App: React.FC = () => {
+const MainAppContent: React.FC = () => {
+  const { currentScreen, navigateTo } = useApp();
   const [viewMode, setViewMode] = useState<'poster' | 'single'>('poster');
-  const [activeTab, setActiveTab] = useState<'scan' | 'folder' | 'assistant'>('scan');
 
   return (
     <div className="min-h-screen bg-[#F0F5F2] text-slate-800 flex flex-col font-sans">
@@ -33,7 +34,7 @@ export const App: React.FC = () => {
               <h1 className="text-xl font-extrabold text-emerald-950 flex items-center gap-1.5 leading-none">
                 PhytoScan <span className="text-emerald-600">AI</span>
               </h1>
-              <p className="text-xs text-gray-500 font-medium mt-0.5">Frontend Prototype UI</p>
+              <p className="text-xs text-gray-500 font-medium mt-0.5">Frontend Interactif & Navigation Inter-Écrans</p>
             </div>
           </div>
 
@@ -165,23 +166,23 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* SINGLE PHONE SIMULATOR VIEW */}
+        {/* SINGLE PHONE SIMULATOR VIEW (Interactive Screen by Screen) */}
         {viewMode === 'single' && (
           <div className="flex flex-col items-center justify-center pb-6">
-            <div className="w-full max-w-[400px] h-[680px] bg-white rounded-[40px] shadow-2xl border-4 border-slate-800 p-2 flex flex-col justify-between">
+            <div className="w-full max-w-[400px] h-[690px] bg-white rounded-[40px] shadow-2xl border-4 border-slate-800 p-2 flex flex-col justify-between">
               {/* Active Screen */}
               <div className="flex-1 overflow-hidden rounded-[28px]">
-                {activeTab === 'scan' && <ScanScreen />}
-                {activeTab === 'folder' && <PlantFolderScreen />}
-                {activeTab === 'assistant' && <VoiceAssistantScreen />}
+                {currentScreen === 'scan' && <ScanScreen />}
+                {currentScreen === 'folder' && <PlantFolderScreen />}
+                {currentScreen === 'assistant' && <VoiceAssistantScreen />}
               </div>
 
               {/* Bottom Mobile Tab Bar */}
-              <nav className="flex justify-around items-center pt-2 pb-1 border-t border-gray-100 bg-white">
+              <nav className="flex justify-around items-center pt-2.5 pb-1 border-t border-gray-100 bg-white">
                 <button
-                  onClick={() => setActiveTab('scan')}
-                  className={`flex flex-col items-center text-[10px] font-bold ${
-                    activeTab === 'scan' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
+                  onClick={() => navigateTo('scan' as ScreenType)}
+                  className={`flex flex-col items-center text-[10px] font-bold transition ${
+                    currentScreen === 'scan' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
                   }`}
                 >
                   <Scan className="w-5 h-5 mb-0.5" />
@@ -189,9 +190,9 @@ export const App: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab('folder')}
-                  className={`flex flex-col items-center text-[10px] font-bold ${
-                    activeTab === 'folder' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
+                  onClick={() => navigateTo('folder' as ScreenType)}
+                  className={`flex flex-col items-center text-[10px] font-bold transition ${
+                    currentScreen === 'folder' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
                   }`}
                 >
                   <FolderHeart className="w-5 h-5 mb-0.5" />
@@ -199,13 +200,15 @@ export const App: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => setActiveTab('assistant')}
-                  className={`flex flex-col items-center text-[10px] font-bold ${
-                    activeTab === 'assistant' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
+                  onClick={() => navigateTo('assistant' as ScreenType)}
+                  className={`flex flex-col items-center text-[10px] font-bold transition relative ${
+                    currentScreen === 'assistant' ? 'text-[#10564F]' : 'text-gray-400 hover:text-gray-600'
                   }`}
                 >
                   <Bot className="w-5 h-5 mb-0.5" />
                   <span>Assistant</span>
+                  {/* Badge alerte rouge */}
+                  <span className="w-2 h-2 rounded-full bg-red-500 absolute top-0 right-3 ring-2 ring-white"></span>
                 </button>
               </nav>
             </div>
@@ -246,6 +249,14 @@ export const App: React.FC = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AppProvider>
+      <MainAppContent />
+    </AppProvider>
   );
 };
 
